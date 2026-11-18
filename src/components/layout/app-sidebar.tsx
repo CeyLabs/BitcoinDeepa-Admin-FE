@@ -1,5 +1,10 @@
 import * as React from "react"
-import { LayoutDashboardIcon, ReceiptTextIcon, UsersIcon } from "lucide-react"
+import {
+  LandmarkIcon,
+  LayoutDashboardIcon,
+  ReceiptTextIcon,
+  UsersIcon,
+} from "lucide-react"
 import { Link } from "react-router"
 
 import { NavMain, type NavItem } from "@/components/layout/nav-main"
@@ -19,6 +24,7 @@ const navItems: NavItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: <LayoutDashboardIcon /> },
   { title: "Members", url: "/members", icon: <UsersIcon /> },
   { title: "Transactions", url: "/transactions", icon: <ReceiptTextIcon /> },
+  { title: "Bank Reviews", url: "/bank-reviews", icon: <LandmarkIcon /> },
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

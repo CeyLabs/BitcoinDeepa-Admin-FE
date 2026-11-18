@@ -16,6 +16,24 @@ export async function apiFetch<T>(path: string): Promise<T> {
     credentials: "include",
     headers: { Accept: "application/json" },
   })
+  return readJson<T>(res)
+}
+
+/** POST JSON to the backend, sending the admin session cookie. */
+export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${env.apiUrl}${path}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body ?? {}),
+  })
+  return readJson<T>(res)
+}
+
+async function readJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let message = res.statusText || "Request failed"
     try {
