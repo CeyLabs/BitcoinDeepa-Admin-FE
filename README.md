@@ -20,8 +20,12 @@ src/
   features/     # one folder per feature: api/, components/, hooks/, pages/, index.ts
     auth/
     dashboard/
-  components/   # shared: ui/ (shadcn), layout/ (sidebar, header)
+  components/   # shared: ui/ (shadcn), layout/ (sidebar, header), data-table/ (TanStack Table)
   hooks/ lib/   # shared hooks and helpers
 ```
 
 Features import each other only through their `index.ts`.
+
+## Tables
+
+All tables use TanStack Table (v9) through `components/data-table`: `useDataTable` (server-side pagination), `DataTable`, `DataTablePagination` and `DataTableSearch`. Define columns per feature with `createColumnHelper<DataTableFeatures, Row>()` and keep filters/page in the URL with nuqs (see `features/members`).
