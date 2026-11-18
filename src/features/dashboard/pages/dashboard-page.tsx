@@ -1,7 +1,6 @@
-import { ChartAreaInteractive } from "../components/chart-area-interactive"
-import { DataTable } from "../components/data-table"
+import { CollectedChart } from "../components/collected-chart"
+import { RecentTransactions } from "../components/recent-transactions"
 import { SectionCards } from "../components/section-cards"
-import data from "../data/dashboard.json"
 
 export function DashboardPage() {
   return (
@@ -9,9 +8,11 @@ export function DashboardPage() {
       <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
         <SectionCards />
         <div className="px-4 lg:px-6">
-          <ChartAreaInteractive />
+          <CollectedChart />
         </div>
-        <DataTable data={data} />
+        <div className="px-4 lg:px-6">
+          <RecentTransactions />
+        </div>
       </div>
     </div>
   )
