@@ -1,5 +1,5 @@
 import * as React from "react"
-import { LayoutDashboardIcon, ReceiptTextIcon } from "lucide-react"
+import { LayoutDashboardIcon, ReceiptTextIcon, UsersIcon } from "lucide-react"
 import { Link } from "react-router"
 
 import { NavMain, type NavItem } from "@/components/layout/nav-main"
@@ -17,6 +17,7 @@ import {
 
 const navItems: NavItem[] = [
   { title: "Dashboard", url: "/dashboard", icon: <LayoutDashboardIcon /> },
+  { title: "Members", url: "/members", icon: <UsersIcon /> },
   { title: "Transactions", url: "/transactions", icon: <ReceiptTextIcon /> },
 ]
 
