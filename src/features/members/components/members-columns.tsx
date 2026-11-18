@@ -70,7 +70,19 @@ const columns = column.columns([
   }),
   column.accessor("totalPaidLkr", {
     header: "Paid",
-    cell: (info) => formatLkr(info.getValue()),
+    cell: (info) => {
+      const unsettled = info.row.original.unsettledLkr
+      return (
+        <div className="flex flex-col items-end">
+          <span>{formatLkr(info.getValue())}</span>
+          {unsettled > 0 && (
+            <span className="text-xs text-amber-700 dark:text-amber-400">
+              +{formatLkr(unsettled)} unsettled
+            </span>
+          )}
+        </div>
+      )
+    },
     meta: { className: "text-right tabular-nums" },
   }),
   column.accessor("satoshis", {

@@ -28,8 +28,11 @@ export interface Member {
   kycStatus: KycStatus
   joinedAt: string
   activePlan: string | null
+  /** Settled payments: paid and sats sent */
   totalPaidLkr: number
   satoshis: number
+  /** Paid, sats not sent (yet) */
+  unsettledLkr: number
 }
 
 export interface MemberPage {
