@@ -1,5 +1,6 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query"
 
+import type { PageSize } from "@/components/data-table"
 import { apiFetch } from "@/lib/api"
 
 export const TRANSACTION_STATUSES = [
@@ -10,9 +11,6 @@ export const TRANSACTION_STATUSES = [
   "CHARGEBACK",
 ] as const
 export type TransactionStatus = (typeof TRANSACTION_STATUSES)[number]
-
-export const PAGE_SIZES = [10, 20, 50, 100] as const
-export type PageSize = (typeof PAGE_SIZES)[number]
 
 export interface Transaction {
   id: string

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react"
-import { SearchIcon, XIcon } from "lucide-react"
+import { XIcon } from "lucide-react"
+
+import { DataTableSearch } from "@/components/data-table"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,42 +29,20 @@ const statusItems: Record<string, string> = {
 export function TransactionsFilters() {
   const [filters, setFilters] = useTransactionFilters()
 
-  // Search box: type freely, update the URL (and refetch) 300ms after typing stops
-  const [search, setSearch] = useState(filters.q ?? "")
-  const [syncedQ, setSyncedQ] = useState(filters.q)
-  if (filters.q !== syncedQ) {
-    // URL changed elsewhere (back button, "Clear")
-    setSyncedQ(filters.q)
-    setSearch(filters.q ?? "")
-  }
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  // Don't apply a pending search after leaving the page
-  useEffect(() => () => clearTimeout(timer.current), [])
-  function onSearch(value: string) {
-    setSearch(value)
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => {
-      void setFilters({ q: value.trim() || null, page: null })
-    }, 300)
-  }
-
   const hasFilters = Boolean(
     filters.status || filters.from || filters.to || filters.q
   )
 
   return (
     <div className="flex flex-wrap items-end gap-2">
-      <div className="relative w-full sm:w-64">
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="search"
-          value={search}
-          onChange={(e) => onSearch(e.target.value)}
-          placeholder="Payment ID, member ID or name"
-          aria-label="Search transactions"
-          className="pl-8"
-        />
-      </div>
+      <DataTableSearch
+        value={filters.q}
+        onChange={(q) =>
+          void setFilters({ q, page: null }, { history: "replace" })
+        }
+        placeholder="Payment ID, member ID or name"
+        label="Search transactions"
+      />
       <Select
         items={statusItems}
         value={filters.status ?? ALL}

@@ -10,28 +10,26 @@ import {
 } from "@/components/ui/select"
 import { formatNumber } from "@/lib/format"
 
-import { PAGE_SIZES, type PageSize } from "../api/transactions"
+import type { RowData } from "@tanstack/react-table"
 
-export function TransactionsPagination({
-  page,
-  pageSize,
-  pageCount,
-  total,
-  onPageChange,
-  onPageSizeChange,
+import type { DataTableInstance } from "./use-data-table"
+
+export const PAGE_SIZES = [10, 20, 50, 100] as const
+export type PageSize = (typeof PAGE_SIZES)[number]
+
+const sizeItems = Object.fromEntries(
+  PAGE_SIZES.map((size) => [String(size), `${size} / page`])
+)
+
+export function DataTablePagination<TData extends RowData>({
+  table,
 }: {
-  page: number
-  pageSize: PageSize
-  pageCount: number
-  total: number
-  onPageChange: (page: number) => void
-  onPageSizeChange: (pageSize: PageSize) => void
+  table: DataTableInstance<TData>
 }) {
-  const first = total === 0 ? 0 : (page - 1) * pageSize + 1
-  const last = Math.min(page * pageSize, total)
-  const sizeItems = Object.fromEntries(
-    PAGE_SIZES.map((size) => [String(size), `${size} / page`])
-  )
+  const { pageIndex, pageSize } = table.state.pagination
+  const total = table.getRowCount()
+  const first = total === 0 ? 0 : pageIndex * pageSize + 1
+  const last = Math.min((pageIndex + 1) * pageSize, total)
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
@@ -44,7 +42,7 @@ export function TransactionsPagination({
         <Select
           items={sizeItems}
           value={String(pageSize)}
-          onValueChange={(value) => onPageSizeChange(Number(value) as PageSize)}
+          onValueChange={(value) => table.setPageSize(Number(value))}
         >
           <SelectTrigger size="sm" className="w-32" aria-label="Rows per page">
             <SelectValue />
@@ -58,14 +56,15 @@ export function TransactionsPagination({
           </SelectContent>
         </Select>
         <span className="tabular-nums">
-          Page {formatNumber(page)} of {formatNumber(pageCount)}
+          Page {formatNumber(pageIndex + 1)} of{" "}
+          {formatNumber(Math.max(1, table.getPageCount()))}
         </span>
         <Button
           variant="outline"
           size="icon-sm"
           aria-label="Previous page"
-          disabled={page <= 1}
-          onClick={() => onPageChange(page - 1)}
+          disabled={!table.getCanPreviousPage()}
+          onClick={() => table.previousPage()}
         >
           <ChevronLeftIcon />
         </Button>
@@ -73,8 +72,8 @@ export function TransactionsPagination({
           variant="outline"
           size="icon-sm"
           aria-label="Next page"
-          disabled={page >= pageCount}
-          onClick={() => onPageChange(page + 1)}
+          disabled={!table.getCanNextPage()}
+          onClick={() => table.nextPage()}
         >
           <ChevronRightIcon />
         </Button>

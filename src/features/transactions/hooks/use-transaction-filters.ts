@@ -6,7 +6,9 @@ import {
   useQueryStates,
 } from "nuqs"
 
-import { PAGE_SIZES, TRANSACTION_STATUSES } from "../api/transactions"
+import { PAGE_SIZES } from "@/components/data-table"
+
+import { TRANSACTION_STATUSES } from "../api/transactions"
 
 const filterParsers = {
   page: parseAsInteger.withDefault(1),
@@ -19,7 +21,8 @@ const filterParsers = {
 
 /**
  * Transactions page filters, kept in the URL (?page=2&status=FAILED...).
- * Each change is a history entry, so Back returns to the previous page/filters.
+ * Each page or filter change is a history entry, so Back returns to it; typing
+ * a search replaces the entry instead of adding one per pause.
  */
 export function useTransactionFilters() {
   return useQueryStates(filterParsers, {

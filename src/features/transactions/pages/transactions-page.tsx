@@ -1,13 +1,19 @@
 import { useQuery } from "@tanstack/react-query"
 
+import {
+  DataTable,
+  DataTablePagination,
+  PAGE_SIZES,
+  useDataTable,
+  type PageSize,
+} from "@/components/data-table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { transactionsQueryOptions } from "../api/transactions"
+import { transactionColumns } from "../components/transactions-columns"
 import { TransactionsFilters } from "../components/transactions-filters"
-import { TransactionsPagination } from "../components/transactions-pagination"
-import { TransactionsTable } from "../components/transactions-table"
 import { useTransactionFilters } from "../hooks/use-transaction-filters"
 
 export function TransactionsPage() {
@@ -15,6 +21,30 @@ export function TransactionsPage() {
   const { data, isPending, isError, error, isPlaceholderData } = useQuery(
     transactionsQueryOptions(filters)
   )
+
+  const table = useDataTable({
+    data: data?.items ?? [],
+    columns: transactionColumns,
+    getRowId: (tx) => tx.id,
+    pagination: {
+      page: filters.page,
+      pageSize: filters.pageSize,
+      total: data?.total ?? 0,
+      onChange: ({ page, pageSize }) =>
+        void setFilters(
+          pageSize !== filters.pageSize
+            ? {
+                pageSize: PAGE_SIZES.includes(pageSize as PageSize)
+                  ? (pageSize as PageSize)
+                  : null,
+                page: null,
+              }
+            : { page }
+        ),
+    },
+  })
+
+  const pastLastPage = data && data.items.length === 0 && data.total > 0
 
   return (
     <div className="flex flex-col gap-4 p-4 lg:p-6">
@@ -29,10 +59,12 @@ export function TransactionsPage() {
             </p>
           ) : (
             <>
-              {data.items.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-12 text-sm text-muted-foreground">
-                  {data.total > 0 ? (
-                    <>
+              <DataTable
+                table={table}
+                dimmed={isPlaceholderData}
+                emptyMessage={
+                  pastLastPage ? (
+                    <div className="flex flex-col items-center gap-2">
                       This page is empty.
                       <Button
                         variant="outline"
@@ -41,30 +73,13 @@ export function TransactionsPage() {
                       >
                         Go to first page
                       </Button>
-                    </>
+                    </div>
                   ) : (
                     "No transactions match these filters"
-                  )}
-                </div>
-              ) : (
-                <div
-                  className={
-                    isPlaceholderData ? "opacity-60 transition-opacity" : ""
-                  }
-                >
-                  <TransactionsTable transactions={data.items} showPaymentId />
-                </div>
-              )}
-              <TransactionsPagination
-                page={filters.page}
-                pageSize={filters.pageSize}
-                pageCount={data.pageCount}
-                total={data.total}
-                onPageChange={(page) => void setFilters({ page })}
-                onPageSizeChange={(pageSize) =>
-                  void setFilters({ pageSize, page: null })
+                  )
                 }
               />
+              <DataTablePagination table={table} />
             </>
           )}
         </CardContent>
