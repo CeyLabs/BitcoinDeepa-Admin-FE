@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router"
 
 import { LoginPage, redirectIfSignedIn, requireAdmin } from "@/features/auth"
+import { BankReviewsPage } from "@/features/bank-reviews"
 import { DashboardPage } from "@/features/dashboard"
 import { MembersPage } from "@/features/members"
 import { TransactionsPage } from "@/features/transactions"
@@ -36,6 +37,11 @@ export const router = createBrowserRouter([
             path: "members",
             Component: MembersPage,
             handle: { title: "Members" },
+          },
+          {
+            path: "bank-reviews",
+            Component: BankReviewsPage,
+            handle: { title: "Bank Reviews" },
           },
           { path: "*", Component: NotFoundPage },
         ],
