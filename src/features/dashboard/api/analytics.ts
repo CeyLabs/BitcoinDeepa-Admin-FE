@@ -13,12 +13,17 @@ export interface AnalyticsSummary {
     satoshis: number
     grossLkrLast30Days: number
   }
+  /** SUCCESS payments whose sats weren't sent (yet); not in `payments` */
+  unsettled: { count: number; grossLkr: number; satoshis: number }
 }
 
 export interface DailyPoint {
   date: string
+  /** Settled payments */
   grossLkr: number
   payments: number
+  /** Paid, sats not sent (yet) */
+  unsettledGrossLkr: number
   newUsers: number
 }
 
