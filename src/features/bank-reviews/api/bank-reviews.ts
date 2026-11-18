@@ -20,11 +20,13 @@ export type BankReviewStatus = (typeof BANK_REVIEW_STATUSES)[number]
 export interface BankReview {
   id: string
   userId: string
-  /** Name on the member's profile */
+  /** Telegram profile name: the member can change it, not proof of identity */
   memberName: string
+  /** Name Didit read from the member's ID: what the statement must match */
+  verifiedName: string | null
   kycStatus: KycStatus
   accountName: string
-  /** 0..1 match of accountName against memberName (a hint only) */
+  /** 0..1 match of accountName against verifiedName (a hint only) */
   nameMatchScore: number | null
   bankCode: number
   bankName: string
@@ -76,7 +78,10 @@ export const pendingBankReviewsQueryOptions = () =>
     refetchInterval: 60_000,
   })
 
-/** Presigned links expire after 5 minutes, so never serve a stale one. */
+/**
+ * Presigned links expire after 5 minutes: never serve a stale one, and renew
+ * it while the sheet is open so "Open in new tab" keeps working.
+ */
 export const statementQueryOptions = (id: string) =>
   queryOptions({
     queryKey: [...KEY, "statement", id],
@@ -84,6 +89,7 @@ export const statementQueryOptions = (id: string) =>
       apiFetch<{ url: string }>(`/admin/bank-reviews/${id}/statement`),
     staleTime: 4 * 60_000,
     gcTime: 4 * 60_000,
+    refetchInterval: 4 * 60_000,
   })
 
 export function useApproveBank() {

@@ -17,11 +17,11 @@ export function bankReviewColumns(
   onReview: (review: BankReview) => void
 ): DataTableColumns<BankReview> {
   return column.columns([
-    column.accessor("memberName", {
-      header: "Member",
+    column.accessor("verifiedName", {
+      header: "Member (verified name)",
       cell: (info) => (
         <div className="flex flex-col">
-          <span>{info.getValue() || "—"}</span>
+          <span>{info.getValue() ?? "—"}</span>
           <span className="text-xs text-muted-foreground">
             {info.row.original.userId}
           </span>

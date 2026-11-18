@@ -12,7 +12,7 @@ import type { KycStatus, Member } from "../api/members"
 export const kycLabel = (status: KycStatus) =>
   status.charAt(0) + status.slice(1).toLowerCase().replace(/_/g, " ")
 
-const kycVariant: Record<
+export const kycVariant: Record<
   KycStatus,
   "default" | "secondary" | "destructive" | "outline"
 > = {

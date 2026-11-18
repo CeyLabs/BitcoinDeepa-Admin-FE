@@ -14,6 +14,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { formatDateTime } from "@/lib/format"
+import {
+  kycLabel,
+  kycVariant,
+} from "@/features/members/components/members-columns"
 
 import {
   useApproveBank,
@@ -48,8 +52,9 @@ function Row({
 }
 
 /**
- * Check the statement against the member's name and the account details,
- * then approve (registers the account with CeyPay) or reject with a reason.
+ * Check the statement against the member's verified (ID) name and the account
+ * details, then approve (registers the account with CeyPay, after a confirm)
+ * or reject with a reason.
  */
 export function ReviewSheet({
   review,
@@ -59,13 +64,16 @@ export function ReviewSheet({
   onClose: () => void
 }) {
   const [rejecting, setRejecting] = useState(false)
+  const [confirmingApprove, setConfirmingApprove] = useState(false)
   const [reason, setReason] = useState(DEFAULT_REJECT_REASON)
   const approve = useApproveBank()
   const reject = useRejectBank()
   const busy = approve.isPending || reject.isPending
+  const kycApproved = review?.kycStatus === "APPROVED"
 
   const close = () => {
     setRejecting(false)
+    setConfirmingApprove(false)
     setReason(DEFAULT_REJECT_REASON)
     onClose()
   }
@@ -103,8 +111,8 @@ export function ReviewSheet({
                 <Badge variant="outline">{statusLabel[review.status]}</Badge>
               </SheetTitle>
               <SheetDescription>
-                Check the statement shows this account number and a name that
-                matches the member.
+                Check the statement shows this account number and the
+                member&apos;s verified name (from their ID, not Telegram).
               </SheetDescription>
             </SheetHeader>
 
@@ -113,12 +121,24 @@ export function ReviewSheet({
 
               <div className="flex flex-col gap-4 text-sm">
                 <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
-                  <Row label="Member">{review.memberName || "—"}</Row>
-                  <Row label="Telegram ID">{review.userId}</Row>
+                  <Row label="Verified name">
+                    {review.verifiedName ?? (
+                      <span className="text-destructive">Not available</span>
+                    )}
+                  </Row>
                   <Row label="Account name">{review.accountName}</Row>
                   <Row label="Name match">
                     <MatchBadge score={review.nameMatchScore} />
                   </Row>
+                  <Row label="KYC">
+                    <Badge variant={kycVariant[review.kycStatus]}>
+                      {kycLabel(review.kycStatus)}
+                    </Badge>
+                  </Row>
+                </div>
+                <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
+                  <Row label="Telegram name">{review.memberName || "—"}</Row>
+                  <Row label="Telegram ID">{review.userId}</Row>
                 </div>
                 <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
                   <Row label="Bank">{review.bankName}</Row>
@@ -143,6 +163,13 @@ export function ReviewSheet({
                   </p>
                 )}
 
+                {review.status === "PENDING_REVIEW" && !kycApproved && (
+                  <p className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-destructive">
+                    This member&apos;s KYC is no longer approved, so the account
+                    can&apos;t be verified.
+                  </p>
+                )}
+
                 {review.status === "PENDING_REVIEW" && rejecting && (
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="bank-reject-reason">
@@ -163,7 +190,25 @@ export function ReviewSheet({
 
             {review.status === "PENDING_REVIEW" && (
               <SheetFooter className="flex-row justify-end border-t">
-                {rejecting ? (
+                {confirmingApprove ? (
+                  <>
+                    <p className="mr-auto self-center text-sm">
+                      Approve payouts to {review.bankName}{" "}
+                      <span className="font-mono">{review.accountNumber}</span>?
+                    </p>
+                    <Button
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => setConfirmingApprove(false)}
+                    >
+                      Back
+                    </Button>
+                    <Button disabled={busy} onClick={() => void onApprove()}>
+                      <CheckCircle2Icon />
+                      {approve.isPending ? "Approving…" : "Yes, approve"}
+                    </Button>
+                  </>
+                ) : rejecting ? (
                   <>
                     <Button
                       variant="outline"
@@ -190,9 +235,12 @@ export function ReviewSheet({
                       <XCircleIcon className="text-destructive" />
                       Reject
                     </Button>
-                    <Button disabled={busy} onClick={() => void onApprove()}>
+                    <Button
+                      disabled={busy || !kycApproved}
+                      onClick={() => setConfirmingApprove(true)}
+                    >
                       <CheckCircle2Icon />
-                      {approve.isPending ? "Approving…" : "Approve"}
+                      Approve
                     </Button>
                   </>
                 )}
