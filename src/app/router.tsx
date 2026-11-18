@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router"
 
 import { LoginPage, redirectIfSignedIn, requireAdmin } from "@/features/auth"
 import { DashboardPage } from "@/features/dashboard"
+import { TransactionsPage } from "@/features/transactions"
 
 import { AppLayout } from "./layouts/app-layout"
 import { LoadingScreen } from "./loading-screen"
@@ -20,7 +21,16 @@ export const router = createBrowserRouter([
         Component: AppLayout,
         children: [
           { index: true, element: <Navigate to="/dashboard" replace /> },
-          { path: "dashboard", Component: DashboardPage },
+          {
+            path: "dashboard",
+            Component: DashboardPage,
+            handle: { title: "Dashboard" },
+          },
+          {
+            path: "transactions",
+            Component: TransactionsPage,
+            handle: { title: "Transactions" },
+          },
           { path: "*", Component: NotFoundPage },
         ],
       },
