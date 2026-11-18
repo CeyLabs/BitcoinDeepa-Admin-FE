@@ -27,7 +27,8 @@ import {
 import { useAnalyticsRange } from "../hooks/use-analytics-range"
 
 const chartConfig = {
-  grossLkr: { label: "Collected", color: "var(--primary)" },
+  grossLkr: { label: "Settled", color: "var(--primary)" },
+  unsettledGrossLkr: { label: "Unsettled", color: "var(--chart-4)" },
 } satisfies ChartConfig
 
 export function CollectedChart() {
@@ -36,6 +37,8 @@ export function CollectedChart() {
 
   const total = data?.reduce((sum, day) => sum + day.grossLkr, 0) ?? 0
   const payments = data?.reduce((sum, day) => sum + day.payments, 0) ?? 0
+  const unsettled =
+    data?.reduce((sum, day) => sum + day.unsettledGrossLkr, 0) ?? 0
 
   return (
     <Card className="@container/card">
@@ -43,7 +46,7 @@ export function CollectedChart() {
         <CardTitle>Collected (LKR)</CardTitle>
         <CardDescription>
           {data
-            ? `${formatLkr(total)} from ${formatNumber(payments)} payments in the last ${range} days`
+            ? `${formatLkr(total)} settled from ${formatNumber(payments)} payments in the last ${range} days${unsettled > 0 ? ` · ${formatLkr(unsettled)} unsettled` : ""}`
             : `Last ${range} days`}
         </CardDescription>
         <CardAction>
@@ -128,6 +131,14 @@ export function CollectedChart() {
                 type="monotone"
                 fill="url(#fillCollected)"
                 stroke="var(--color-grossLkr)"
+              />
+              <Area
+                dataKey="unsettledGrossLkr"
+                type="monotone"
+                fill="var(--color-unsettledGrossLkr)"
+                fillOpacity={0.15}
+                stroke="var(--color-unsettledGrossLkr)"
+                strokeDasharray="4 4"
               />
             </AreaChart>
           </ChartContainer>

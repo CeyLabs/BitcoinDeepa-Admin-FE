@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { cn } from "cn"
 
 import {
   Card,
@@ -17,14 +18,22 @@ function StatCard({
   value,
   primary,
   secondary,
+  warning = false,
 }: {
   label: string
   value: string
   primary: string
   secondary: string
+  /** Highlight a number that needs someone to look at it */
+  warning?: boolean
 }) {
   return (
-    <Card className="@container/card">
+    <Card
+      className={cn(
+        "@container/card",
+        warning && "ring-1 ring-amber-500/40 dark:ring-amber-400/40"
+      )}
+    >
       <CardHeader>
         <CardDescription>{label}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -40,7 +49,7 @@ function StatCard({
 }
 
 const grid =
-  "grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card"
+  "grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-3 @7xl/main:grid-cols-5 dark:*:data-[slot=card]:bg-card"
 
 export function SectionCards() {
   const { data, isPending, isError, error } = useQuery(summaryQueryOptions())
@@ -48,7 +57,7 @@ export function SectionCards() {
   if (isPending) {
     return (
       <div className={grid}>
-        {Array.from({ length: 4 }, (_, i) => (
+        {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-36 rounded-xl" />
         ))}
       </div>
@@ -63,7 +72,7 @@ export function SectionCards() {
     )
   }
 
-  const { users, subscriptions, payments } = data
+  const { users, subscriptions, payments, unsettled } = data
   return (
     <div className={grid}>
       <StatCard
@@ -82,13 +91,20 @@ export function SectionCards() {
         label="Collected"
         value={formatLkr(payments.grossLkr)}
         primary={`${formatLkr(payments.grossLkrLast30Days)} in the last 30 days`}
-        secondary={`${formatNumber(payments.successful)} successful payments`}
+        secondary={`${formatNumber(payments.successful)} settled payments`}
       />
       <StatCard
         label="Bitcoin purchased"
         value={formatBtc(payments.satoshis)}
         primary={`${formatNumber(payments.satoshis)} sats`}
         secondary={`Platform fees: ${formatLkr(payments.bitcoindeepaFeesLkr)}`}
+      />
+      <StatCard
+        label="Unsettled"
+        value={formatLkr(unsettled.grossLkr)}
+        primary={`${formatNumber(unsettled.count)} paid, sats not sent`}
+        secondary={`${formatNumber(unsettled.satoshis)} sats owed · not in the totals`}
+        warning={unsettled.count > 0}
       />
     </div>
   )
