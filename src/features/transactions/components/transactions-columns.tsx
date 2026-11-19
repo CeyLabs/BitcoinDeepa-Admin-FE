@@ -45,9 +45,15 @@ const member = column.accessor("user", {
     )
   },
 })
+// One-time buys have no plan: shown as a badge in the same column
 const plan = column.accessor("packageName", {
   header: "Plan",
-  cell: (info) => info.getValue() ?? "—",
+  cell: (info) =>
+    info.row.original.kind === "ONE_TIME" ? (
+      <Badge variant="outline">One-time buy</Badge>
+    ) : (
+      (info.getValue() ?? "—")
+    ),
 })
 const amount = column.accessor("grossLkr", {
   header: "Amount",
