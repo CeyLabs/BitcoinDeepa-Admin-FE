@@ -14,6 +14,7 @@ import {
 
 import {
   TRANSACTION_STATUSES,
+  type TransactionKind,
   type TransactionStatus,
 } from "../api/transactions"
 import { useTransactionFilters } from "../hooks/use-transaction-filters"
@@ -26,11 +27,17 @@ const statusItems: Record<string, string> = {
   ),
 }
 
+const kindItems: Record<string, string> = {
+  [ALL]: "All types",
+  RECURRING: "Plan charges",
+  ONE_TIME: "One-time buys",
+}
+
 export function TransactionsFilters() {
   const [filters, setFilters] = useTransactionFilters()
 
   const hasFilters = Boolean(
-    filters.status || filters.from || filters.to || filters.q
+    filters.status || filters.kind || filters.from || filters.to || filters.q
   )
 
   return (
@@ -58,6 +65,27 @@ export function TransactionsFilters() {
         </SelectTrigger>
         <SelectContent>
           {Object.entries(statusItems).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        items={kindItems}
+        value={filters.kind ?? ALL}
+        onValueChange={(value) =>
+          void setFilters({
+            kind: value === ALL ? null : (value as TransactionKind),
+            page: null,
+          })
+        }
+      >
+        <SelectTrigger className="w-40" aria-label="Type">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(kindItems).map(([value, label]) => (
             <SelectItem key={value} value={value}>
               {label}
             </SelectItem>
@@ -94,6 +122,7 @@ export function TransactionsFilters() {
           onClick={() =>
             void setFilters({
               status: null,
+              kind: null,
               from: null,
               to: null,
               q: null,

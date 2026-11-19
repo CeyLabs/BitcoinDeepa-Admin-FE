@@ -8,12 +8,13 @@ import {
 
 import { PAGE_SIZES } from "@/components/data-table"
 
-import { TRANSACTION_STATUSES } from "../api/transactions"
+import { TRANSACTION_KINDS, TRANSACTION_STATUSES } from "../api/transactions"
 
 const filterParsers = {
   page: parseAsInteger.withDefault(1),
   pageSize: parseAsNumberLiteral(PAGE_SIZES).withDefault(20),
   status: parseAsStringLiteral(TRANSACTION_STATUSES),
+  kind: parseAsStringLiteral(TRANSACTION_KINDS),
   from: parseAsString,
   to: parseAsString,
   q: parseAsString,

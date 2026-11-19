@@ -12,10 +12,15 @@ export const TRANSACTION_STATUSES = [
 ] as const
 export type TransactionStatus = (typeof TRANSACTION_STATUSES)[number]
 
+/** RECURRING = plan charge, ONE_TIME = one-time buy */
+export const TRANSACTION_KINDS = ["RECURRING", "ONE_TIME"] as const
+export type TransactionKind = (typeof TRANSACTION_KINDS)[number]
+
 export interface Transaction {
   id: string
   createdAt: string
   status: TransactionStatus
+  kind: TransactionKind
   settled: boolean
   grossLkr: number | null
   netLkr: number | null
@@ -36,6 +41,7 @@ export interface TransactionFilters {
   page?: number
   pageSize?: PageSize
   status?: TransactionStatus | null
+  kind?: TransactionKind | null
   /** YYYY-MM-DD, Sri Lanka time, inclusive */
   from?: string | null
   to?: string | null
