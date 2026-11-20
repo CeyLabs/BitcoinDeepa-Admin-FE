@@ -10,7 +10,7 @@ cp .env.example .env   # VITE_API_URL = BitcoinDeepa-DCA-BE URL
 bun run dev
 ```
 
-Sign-in uses the backend's Better Auth (`/api/admin-auth`). Only admins can sign in; create one on the backend with `bun run admin:create --email <email> --name "<name>"`.
+Sign-in uses the backend's Better Auth (`/api/admin-auth`). Only admins can sign in; create the first one on the backend with `bun run admin:create --email <email> --name "<name>"`, then add others from the **Admins** page.
 
 ## Structure
 
